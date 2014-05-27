@@ -4,7 +4,7 @@ Sliding page view controller implementation with better delegate methods than Ap
 
 ## What's wrong with UIPageViewController?
 
-UIPageViewController could be really useful for creating interfaces like the iOS springboard but unfortunately the API is not very flexible and UIPageViewControllerDelegate is not very useful for applicatoins like this. I've been using the API for a number of a different projects lately and quickly become fed up, mostly with the methods provided in UIPageViewControllerDelegate. I tried hacking around, but every implementation was still too easy to break.
+UIPageViewController could be really useful for creating interfaces like the iOS springboard but unfortunately the API is not very flexible and UIPageViewControllerDelegate is not very useful for this kind of application. I've been using the API for a number of a different projects lately and quickly become fed up, mostly with the methods provided in UIPageViewControllerDelegate. I tried hacking around, but every implementation was still too easy to break.
 
 UIPageViewController was originally built for page flipping a la iBooks, and the API certainly reflects that. It wasn't until iOS 6 that Apple decided to expand the breadth of UIPageViewController to allow for use cases more along the lines of Springboard, but in order to keep backwards compatibility and maintain the iBooks use case, they had to do some weird things.
 
