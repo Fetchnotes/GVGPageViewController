@@ -11,6 +11,12 @@
 @protocol GVGPageViewControllerDelegate;
 @protocol GVGPageViewControllerDataSource;
 
+enum {
+    GVGPageViewControllerDirectionBackward = 0,
+    GVGPageViewControllerDirectionForward = 1
+};
+typedef NSInteger GVGPageViewControllerDirection;
+
 @interface GVGPageViewController : UIViewController <UIScrollViewDelegate>
 
 // Main view is a scroll view with paging enabled
@@ -18,6 +24,12 @@
 
 @property (nonatomic, strong) id<GVGPageViewControllerDelegate> delegate;
 @property (nonatomic, strong) id<GVGPageViewControllerDataSource> dataSource;
+
+// Current view controller
+@property (nonatomic, strong) UIViewController *viewController;
+
+// Call to set initial view controller or to programmatically change the current view controller (optionally animated with direction)
+- (void)setViewController:(UIViewController *)viewController direction:(GVGPageViewControllerDirection)direction animated:(BOOL)animated;
 
 @end
 
@@ -35,19 +47,20 @@
 // Called when user end scrolling gesture, guarantees a transition will occur
 - (void)pageViewController:(GVGPageViewController *)pageViewController willTransitionToViewController:(UIViewController *)viewController;
 
+// Called when a transition has completed
+- (void)pageViewController:(GVGPageViewController *)pageViewController didTransitionToViewController:(UIViewController *)viewController;
+
 @end
 
-// Data source determines which view controllers are included
+// Data source determines which view controllers should be displayed
 @protocol GVGPageViewControllerDataSource <NSObject>
 
 @required
 
-@property (nonatomic, strong) NSMutableArray *viewControllers;
-
-// Called when swiping right for the next view controller
+// Called to determine the next view controller
 - (UIViewController *)pageViewController:(GVGPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController;
 
-// Called when swiping left for the previous view controller
+// Called to determine the previous view controller
 - (UIViewController *)pageViewController:(GVGPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController;
 
 @end
