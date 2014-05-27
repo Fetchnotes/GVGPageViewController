@@ -25,7 +25,7 @@ The first, `pageViewController:mightTransitionToViewController:`, is called when
 
 The second, `pageViewController:willTransitionToViewController:`, is called when the user ends scrolling, just before the transition to the new view controller begins. This tells the delegate that a transition is guaranteed and immintent, and to which view controller it will be transitioning.
 
-**There are definitely other improvements to be made, so I invite to to please open an issue or fork and pull-request as you see fit! :D**
+**There are definitely other improvements to be made, so please feel free to open an issue or fork and pull-request as you see fit! :D**
 
 ## Not subclassing
 
