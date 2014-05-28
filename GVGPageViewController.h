@@ -28,8 +28,16 @@ typedef NSInteger GVGPageViewControllerDirection;
 // Current view controller
 @property (nonatomic, strong) UIViewController *viewController;
 
+// Previous view controller
+@property (nonatomic, strong) UIViewController *previousViewController;
+
+// Next view controller
+@property (nonatomic, strong) UIViewController *nextViewController;
+
 // Call to set initial view controller or to programmatically change the current view controller (optionally animated with direction)
 - (void)setViewController:(UIViewController *)viewController direction:(GVGPageViewControllerDirection)direction animated:(BOOL)animated;
+
+- (id)initWithFrame:(CGRect)frame;
 
 @end
 

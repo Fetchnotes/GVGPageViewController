@@ -14,36 +14,148 @@
 
 @implementation GVGPageViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    self = [super init];
     if (self) {
         // Custom initialization
+        self.view = [[UIScrollView alloc] initWithFrame:frame];
+        self.view.contentSize = CGSizeMake(frame.size.width * 3, frame.size.height);
+        self.view.contentOffset = CGPointMake(320, 0);
+        self.view.showsHorizontalScrollIndicator = false;
+        self.view.showsVerticalScrollIndicator = false;
+        self.view.pagingEnabled = YES;
+        self.view.delegate = self;
+        self.view.bounces = false;
     }
     return self;
 }
 
-- (void)viewDidLoad
+#pragma mark setViewController: direction: animated:
+
+- (void)setViewController:(UIViewController *)viewController direction:(GVGPageViewControllerDirection)direction animated:(BOOL)animated
 {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    if (animated) {
+
+        // Depending on direct, we must set either previous or next view controller and animate the content offset
+        switch (direction) {
+
+            case GVGPageViewControllerDirectionBackward: {
+
+                self.previousViewController = viewController;
+
+                [UIView animateWithDuration:0.5f animations: ^(void) {
+                    CGPoint offset = self.view.contentOffset;
+                    offset.x -= self.view.frame.size.width;
+                    self.view.contentOffset = offset;
+                } completion: ^(BOOL finished) {
+                    self.viewController = viewController;
+                }];
+                break;
+            }
+
+            case GVGPageViewControllerDirectionForward: {
+
+                self.nextViewController = viewController;
+
+                [UIView animateWithDuration:0.5f animations: ^(void) {
+                    CGPoint offset = self.view.contentOffset;
+                    offset.x -= self.view.frame.size.width;
+                    self.view.contentOffset = offset;
+                } completion: ^(BOOL finished) {
+                    self.viewController = viewController;
+                }];
+                break;
+            }
+
+        }
+    } else {
+        self.viewController = viewController;
+    }
 }
 
-- (void)didReceiveMemoryWarning
+#pragma mark setViewController
+
+- (void)setViewController:(UIViewController *)viewController
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    _viewController = viewController;
+
+    [self addViewController:self.viewController atIndex:1];
+    [self setSurroundingViewControllers];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+- (void)setPreviousViewController:(UIViewController *)previousViewController
 {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    _previousViewController = previousViewController;
+    [self addViewController:self.previousViewController atIndex:0];
 }
-*/
+
+- (void)setNextViewController:(UIViewController *)nextViewController
+{
+    _nextViewController = nextViewController;
+    [self addViewController:self.nextViewController atIndex:2];
+}
+
+- (void)addViewController:(UIViewController *)viewController atIndex:(NSInteger)index
+{
+    [self.view addSubview:viewController.view];
+    CGRect frame = self.view.frame;
+    frame.origin.x = 320 * index;
+    viewController.view.frame = frame;
+    [viewController didMoveToParentViewController:self];
+}
+
+#pragma mark UIScrollViewDelegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if ([self.delegate respondsToSelector:@selector(pageViewController:didScroll:)]) {
+        [self.delegate pageViewController:self didScroll:self.view];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    CGFloat offsetX = self.view.contentOffset.x;
+
+    id newPrevious = [self.dataSource pageViewController:self viewControllerBeforeViewController:self.previousViewController];
+    id newNext = [self.dataSource pageViewController:self viewControllerAfterViewController:self.nextViewController];
+
+    if (offsetX == 0 && newPrevious) {
+        [self.view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+
+        CGRect frame = self.previousViewController.view.frame;
+        frame.origin.x = 320;
+        self.previousViewController.view.frame = frame;
+        [self.view addSubview:self.previousViewController.view];
+
+        self.view.contentOffset = CGPointMake(320, 0);
+
+        self.viewController = self.previousViewController;
+
+        self.previousViewController = [self.dataSource pageViewController:self viewControllerBeforeViewController:self.viewController];
+    } else if (offsetX == 640 && newNext) {
+        [self.view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+
+        CGRect frame = self.nextViewController.view.frame;
+        frame.origin.x = 320;
+        self.nextViewController.view.frame = frame;
+        [self.view addSubview:self.nextViewController.view];
+
+        self.view.contentOffset = CGPointMake(320, 0);
+
+        self.viewController = self.nextViewController;
+
+        self.nextViewController = [self.dataSource pageViewController:self viewControllerAfterViewController:self.viewController];
+    }
+}
+
+#pragma mark Factory
+
+- (void)setSurroundingViewControllers
+{
+    self.previousViewController = [self.dataSource pageViewController:self viewControllerBeforeViewController:self.viewController];
+    self.nextViewController = [self.dataSource pageViewController:self viewControllerAfterViewController:self.viewController];
+}
 
 @end
