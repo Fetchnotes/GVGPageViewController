@@ -26,7 +26,7 @@
         self.view.showsVerticalScrollIndicator = false;
         self.view.pagingEnabled = YES;
         self.view.delegate = self;
-        self.view.bounces = false;
+        self.view.bounces = true;
     }
     return self;
 }
