@@ -20,7 +20,7 @@
     if (self) {
         // Custom initialization
         self.view = [[UIScrollView alloc] initWithFrame:frame];
-        self.view.contentSize = CGSizeMake(frame.size.width * 3, frame.size.height);
+        self.view.contentSize = CGSizeMake(frame.size.width * 2, frame.size.height);
         self.view.contentOffset = CGPointMake(320, 0);
         self.view.showsHorizontalScrollIndicator = false;
         self.view.showsVerticalScrollIndicator = false;
